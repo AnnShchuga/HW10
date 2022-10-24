@@ -1,9 +1,8 @@
-
 import telebot
 
 bot = telebot.TeleBot('5503832266:AAHVuUlj6vOR8YbrgEsCrLoceCMeg9BJ2KE')
 
-del_buttons=telebot.types.ReplyKeyboardRemove())
+del_buttons=telebot.types.ReplyKeyboardRemove()
 
 buttons1 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttons1.row(telebot.types.KeyboardButton('Комплексные'),
@@ -12,27 +11,27 @@ buttons1.row(telebot.types.KeyboardButton('Ещё не определился'),
             telebot.types.KeyboardButton('Выход'))
 
 buttons2 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-buttons2.row(telebot.types.InlineKeybeardButton('/'),
-            telebot.types.InlineKeybeardButton('*'),
-            telebot.types.InlineKeybeardButton('-'),
-            telebot.types.InlineKeybeardButton('+'),
-            telebot.types.InlineKeybeardButton('Выход'))
+buttons2.row(telebot.types.InlineKeyboardButton('/'),
+            telebot.types.InlineKeyboardButton('*'),
+            telebot.types.InlineKeyboardButton('-'),
+            telebot.types.InlineKeyboardButton('+'),
+            telebot.types.InlineKeyboardButton('Выход'))
 
 
-@ bot.message_handler(commands=['log'])
+@bot.message_handler(commands=['log'])
 def hello(msg: telebot.types.Message):
     bot.send_message(chat_id=msg.from_user.id,
                      text='Лог программы\nИстория вычислений',
                      reply_markup=del_buttons)
-    bot.send_message(chat_id=msg.from_user.id, document=open('Calc_log', 'rb')
+    bot.send_message(chat_id=msg.from_user.id, document=open('Calc_log', 'rb'))
 
 
-@ bot.message_handler(commands=['document'])
-    def hello(msg: telebot.types.Message):
-        file = bot.get_file(msg.document.file_id)
-        downloaded_file = bot.download_file(file.file_path)
-        with open(msg.document.file_name. 'wb') as f_out:
-            f_out.write(downloaded_file)
+@bot.message_handler(commands=['document'])
+def hello(msg: telebot.types.Message):
+    file = bot.get_file(msg.document.file_id),
+    downloaded_file = bot.download_file(file.file_path)
+    with open(msg.document.file_name, 'wb') as f_out:
+        f_out.write(downloaded_file)
 
 
 
@@ -54,7 +53,7 @@ def answer(msg: telebot.types.Message):
         bot.register_next_step_handler(msg, first_step_rational_counter)
         bot.send_message(chat_id=msg.from_user.id,
                          text='Введите число',
-                         reply_markup=del_buttons))
+                         reply_markup=del_buttons)
     elif msg.text == 'Ещё не определился':
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id, text='Возвращайтесь, когда определитесь.')
