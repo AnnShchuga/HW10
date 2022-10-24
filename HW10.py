@@ -57,10 +57,12 @@ def answer(msg: telebot.types.Message):
     elif msg.text == 'Ещё не определился':
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id, text='Возвращайтесь, когда определитесь.')
+    elif msg.text == 'Выход':
+        bot.register_next_step_handler(msg, answer)
+        bot.send_message(chat_id=msg.from_user.id, text='Выберите режим работы калькулятора.', reply_markup=buttons1)
     else:
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id, text='Пожалуйста, используйте кнопки.')
-
         bot.send_message(chat_id=msg.from_user.id, text='Выберите режим работы калькулятора.', reply_markup=buttons1)
 
 
@@ -98,7 +100,7 @@ def answer(msg: telebot.types.Message):
                 pass
         else:
             bot.send_message(chat_id=msg.from_user.id,
-                             text='Используйте кнопки!',
+                             text='Пожалуйста, используйте кнопки!',
                              reply_markup=buttons2)
 
 
@@ -135,7 +137,8 @@ def answer(msg: telebot.types.Message):
                 pass
         else:
             bot.send_message(chat_id=msg.from_user.id,
-                             text='Используйте кнопки!',
+                             text='Пожалуйста, используйте кнопки!',
                              reply_markup=buttons2)
 
-    bot.polling()
+    if __name__ == '__main__':
+        executor.start_polling(dp)
