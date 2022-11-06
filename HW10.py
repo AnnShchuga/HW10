@@ -623,3 +623,6 @@ def rational_division(msg: telebot.types.Message):
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
         calc_log1(msg, bots_reply)
+        
+
+bot.polling(non_stop=True)
