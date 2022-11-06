@@ -1,13 +1,27 @@
 
 import telebot
-from spy import log
-from email import message
+import datetime
 import emoji
 
+def calc_log(msg):
+    file = open('calc_log.txt', 'a', encoding='utf-8')
+    file.write(f'Дата: {datetime.datetime.now().time()}\n'
+               f'ID пользователя: {msg.from_user.id}\n'
+               f'Сообщение пользователя: {msg.text}\n')
+    file.close()
+
+def calc_log1(msg, answer):
+    file = open('calc_log1.log', 'a', encoding='utf-8')
+    file.write(f'Дата: {datetime.datetime.now().date()}\n'
+               f'Время: {datetime.datetime.now().time()}\n'
+               f'ID пользователя: {msg.from_user.id}\n'
+               f'Сообщение пользователя: {msg.text}\n'
+               f'Сообщение от бота: {answer}\n')
+    file.close()
 
 bot = telebot.TeleBot('5503832266:AAHVuUlj6vOR8YbrgEsCrLoceCMeg9BJ2KE')
 
-del_buttons=telebot.types.ReplyKeyboardRemove()
+del_buttons = telebot.types.ReplyKeyboardRemove()
 
 buttons1 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttons1.row(telebot.types.KeyboardButton('Комплексные'),
@@ -24,16 +38,16 @@ buttons2.row(telebot.types.InlineKeyboardButton('/'),
 @bot.message_handler(commands=['clear'])
 def hello(msg: telebot.types.Message):
     try:
-        file = open('Calc_log1.log', 'w', encoding='utf-8')
+        file = open('calc_log1.log', 'w', encoding='utf-8')
         file.close()
         bots_reply = 'Файл с историей был очищен.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
         bot.send_message(chat_id=msg.from_user.id,
                          text=f'Лог очищен',
                          reply_markup=del_buttons)
     except Exception:
         bots_reply = 'Произошла ошибка. Ответа от бота не было.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 @bot.message_handler(commands=['log'])
@@ -46,7 +60,7 @@ def hello(msg: telebot.types.Message):
                          text=f'Лог программы\n{f}',
                          reply_markup=del_buttons)
         bots_reply = 'Бот вывел лог программы'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
                          text='<b>Произошла ошибка!</b>\n'
@@ -54,14 +68,14 @@ def hello(msg: telebot.types.Message):
                               'Попробуйте очистить лог и повторите запрос.',
                          reply_markup=buttons1)
         bots_reply = 'Произошла ошибка.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 @bot.message_handler(commands=['start'])
 def hello(msg: telebot.types.Message):
     try:
         bots_reply = 'Бот поприветствовал пользователя и предложил выбор.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
                          text=f'<b>Здравствуйте</b> {emoji.emojize(":waving_hand_light_skin_tone:")}\n'
                               'С какими числами будем работать?',
@@ -69,15 +83,17 @@ def hello(msg: telebot.types.Message):
         bot.register_next_step_handler(msg, answer)
     except Exception:
         bots_reply = 'Произошла ошибка. Ответа от бота не было.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 @bot.message_handler()
 def ooops(msg: telebot.types.Message):
-    bot.reply_to(msg, "Пожалуйста, выберите одну из команд в меню:\n/start - для запуска калькулятора\n"
-                      "/log - для вывода истории работы бота\n/clear - для очистки истории")
+    bot.reply_to(msg, "Пожалуйста, выберите одну из команд в меню:\n"
+                      "/start - для запуска калькулятора\n"
+                      "/calc_log - для вывода истории работы бота\n"
+                      "/clear - для очистки истории")
     bots_reply = 'Бот предложил выбрать одну из команд в меню.'
-    Calc_log1(msg, bots_reply)
+    calc_log1(msg, bots_reply)
 
 
 @bot.message_handler()
@@ -89,11 +105,13 @@ def answer(msg: telebot.types.Message):
                              text='Выберите действие.',
                              reply_markup=buttons2)
             bots_reply = 'Бот предложил выбрать действие.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Рациональные':
         try:
             bot.register_next_step_handler(msg, rational_counter)
@@ -101,21 +119,25 @@ def answer(msg: telebot.types.Message):
                              text='Выберите действие.',
                              reply_markup=buttons2)
             bots_reply = 'Бот предложил выбрать действие.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Ещё не определился':
         try:
             bot.send_message(chat_id=msg.from_user.id, text='Возвращайтесь, когда определитесь.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил вернуться, когда пользователь определится.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     else:
         try:
             bot.register_next_step_handler(msg, answer)
@@ -124,11 +146,13 @@ def answer(msg: telebot.types.Message):
             bot.send_message(chat_id=msg.from_user.id, text='Выберите режим работы калькулятора.',
                              reply_markup=buttons1)
             bots_reply = 'Пользователь не воспользовался кнопками.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
 
 
 def complex_counter(msg: telebot.types.Message):
@@ -139,11 +163,13 @@ def complex_counter(msg: telebot.types.Message):
                              text='Введите 4 числа через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == '-':
         try:
             bot.register_next_step_handler(msg, complex_subtraction)
@@ -151,11 +177,13 @@ def complex_counter(msg: telebot.types.Message):
                              text='Введите 4 числа через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == '*':
         try:
             bot.register_next_step_handler(msg, complex_multiplication)
@@ -163,11 +191,13 @@ def complex_counter(msg: telebot.types.Message):
                              text='Введите 4 числа через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == '/':
         try:
             bot.register_next_step_handler(msg, complex_division)
@@ -175,21 +205,25 @@ def complex_counter(msg: telebot.types.Message):
                              text='Введите 4 числа через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Ещё не определился':
         try:
             bot.send_message(chat_id=msg.from_user.id, text='Возвращайтесь, когда определитесь.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил вернуться, когда пользователь определится.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     else:
         try:
             bot.register_next_step_handler(msg, answer)
@@ -198,11 +232,13 @@ def complex_counter(msg: telebot.types.Message):
             bot.send_message(chat_id=msg.from_user.id, text='С какими числами будем работать?',
                              reply_markup=buttons1)
             bots_reply = 'Пользователь не воспользовался кнопками.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
 
 
 def rational_counter(msg: telebot.types.Message):
@@ -213,11 +249,13 @@ def rational_counter(msg: telebot.types.Message):
                              text='Введите несколько чисел через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Вычитание':
         try:
             bot.register_next_step_handler(msg, rational_subtraction)
@@ -225,11 +263,13 @@ def rational_counter(msg: telebot.types.Message):
                              text='Введите несколько чисел через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Умножение':
         try:
             bot.register_next_step_handler(msg, rational_multiplication)
@@ -237,11 +277,13 @@ def rational_counter(msg: telebot.types.Message):
                              text='Введите несколько чисел через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Деление':
         try:
             bot.register_next_step_handler(msg, rational_division)
@@ -249,21 +291,25 @@ def rational_counter(msg: telebot.types.Message):
                              text='Введите несколько чисел через запятую.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил ввести числа.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     elif msg.text == 'Ещё не определился':
         try:
             bot.send_message(chat_id=msg.from_user.id, text='Возвращайтесь, когда определитесь.',
                              reply_markup=del_buttons)
             bots_reply = 'Бот предложил вернуться, когда пользователь определится.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
     else:
         try:
             bot.register_next_step_handler(msg, answer)
@@ -272,16 +318,18 @@ def rational_counter(msg: telebot.types.Message):
             bot.send_message(chat_id=msg.from_user.id, text='С какими числами будем работать?',
                              reply_markup=buttons1)
             bots_reply = 'Пользователь не воспользовался кнопками.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
         except Exception:
-            bot.reply_to(message, "Ошибка")
+            bot.send_message(chat_id=msg.from_user.id,
+                             text='Произошла ошибка.',
+                             reply_markup=buttons2)
             bots_reply = 'Произошла ошибка.'
-            Calc_log1(msg, bots_reply)
+            calc_log1(msg, bots_reply)
 
 
 def complex_addition(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -301,7 +349,7 @@ def complex_addition(msg: telebot.types.Message):
         bot.send_message(chat_id=msg.from_user.id,
                          text='Продолжим?\nС какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, complex_addition)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -311,12 +359,12 @@ def complex_addition(msg: telebot.types.Message):
                               f'разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def complex_subtraction(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -336,7 +384,7 @@ def complex_subtraction(msg: telebot.types.Message):
         bot.send_message(chat_id=msg.from_user.id,
                          text='Продолжим?\nС какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, complex_subtraction)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -345,12 +393,12 @@ def complex_subtraction(msg: telebot.types.Message):
                               f'разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def complex_multiplication(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -370,7 +418,7 @@ def complex_multiplication(msg: telebot.types.Message):
         bot.send_message(chat_id=msg.from_user.id,
                          text='Продолжим?\nС какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, complex_multiplication)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -379,12 +427,12 @@ def complex_multiplication(msg: telebot.types.Message):
                               '<b>В качестве десятичного разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def complex_division(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -402,25 +450,27 @@ def complex_division(msg: telebot.types.Message):
                          reply_markup=buttons1)
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id,
-                         text='Продолжим?\nС какими числами будем работать?')
+                         text='Продолжим?\n'
+                              'С какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, complex_division)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
                          text='Что-то пошло не так. Повторите ввод. Введите числа через запятую. '
-                              'В качестве десятичного разделителя можно использовать только точку.\n\n'
+                              'В качестве десятичного разделителя можно использовать только точку.\n'
+                              '\n'
                               '=============================\n'
-                              f'{emoji.emojize(":index_pointing_up_light_skin_tone:")}<b>Помните - на ноль делить нельзя!\n'
-                              'Два последних числа не должны быть отрицательными (одно из них - может)</b>',
+                              f'{emoji.emojize(":index_pointing_up_light_skin_tone:")}<b>На 0 делить нельзя!\n'
+                              'Оба последних числа не должны быть отрицательными</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def rational_addition(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -439,14 +489,14 @@ def rational_addition(msg: telebot.types.Message):
             else:
                 string = ' + '.join(lst)
                 res = f'{string} = {new_lst[0] + sum(new_lst[1:])}'
-        bot.send_message(chat_id=msg.from_user.id,
+            bot.send_message(chat_id=msg.from_user.id,
                          text=f'Ответ: {res}',
                          reply_markup=buttons1)
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id,
                          text='Продолжим?\nС какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, rational_addition)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -455,12 +505,12 @@ def rational_addition(msg: telebot.types.Message):
                               '<b>В качестве десятичного разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def rational_subtraction(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -480,14 +530,15 @@ def rational_subtraction(msg: telebot.types.Message):
             else:
                 string = ' - '.join(lst)
                 res = f'{string} = {new_lst[0] - sum(new_lst[1:])}'
-        bot.send_message(chat_id=msg.from_user.id,
+            bot.send_message(chat_id=msg.from_user.id,
                          text=f'Ответ: {res}',
                          reply_markup=buttons1)
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id,
-                         text='Продолжим?\nС какими числами будем работать?')
+                         text='Продолжим?\n'
+                              'С какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, rational_subtraction)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -496,12 +547,12 @@ def rational_subtraction(msg: telebot.types.Message):
                               '<b>В качестве десятичного разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def rational_multiplication(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -520,9 +571,10 @@ def rational_multiplication(msg: telebot.types.Message):
                          reply_markup=buttons1)
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id,
-                         text='Продолжим?\nС какими числами будем работать?')
+                         text='Продолжим?\n'
+                              'С какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, rational_multiplication)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
@@ -531,12 +583,12 @@ def rational_multiplication(msg: telebot.types.Message):
                               '<b>В качестве десятичного разделителя можно использовать только точку</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
 
 
 def rational_division(msg: telebot.types.Message):
     try:
-        lst = msg.text.split(',')
+        lst = msg.text.split(",")
         new_lst = []
         for i in lst:
             if '.' in i:
@@ -555,17 +607,19 @@ def rational_division(msg: telebot.types.Message):
                          reply_markup=buttons1)
         bot.register_next_step_handler(msg, answer)
         bot.send_message(chat_id=msg.from_user.id,
-                         text='Продолжим?\nС какими числами будем работать?')
+                         text='Продолжим?\n'
+                              'С какими числами будем работать?')
         bots_reply = 'Бот предложил продолжить вычисления.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
     except Exception:
         bot.register_next_step_handler(msg, rational_division)
         bot.send_message(chat_id=msg.from_user.id, parse_mode='HTML',
                          text='Что-то пошло не так. Повторите ввод. Введите числа через запятую. '
-                              '<b>В качестве десятичного разделителя можно использовать только точку</b>\n\n'
+                              '<b>В качестве десятичного разделителя можно использовать только точку</b>\n'
+                              '\n'
                               '=============================\n'
                               f'{emoji.emojize(":index_pointing_up_light_skin_tone:")}'
-                              '<b>Помните - на ноль делить нельзя!</b>',
+                              '<b>На 0 делить нельзя!</b>',
                          reply_markup=del_buttons)
         bots_reply = 'Произошла ошибка.Бот предложил повторить ввод.'
-        Calc_log1(msg, bots_reply)
+        calc_log1(msg, bots_reply)
