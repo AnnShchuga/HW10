@@ -22,7 +22,7 @@ def Calc_log1(msg, answer):
     file.close()
 
 
-bot = telebot.TeleBot('5503832266:AAHVuUlj6vOR8YbrgEsCrLoceCMeg9BJ2KE')
+bot = telebot.TeleBot('  ')
 
 del_buttons=telebot.types.ReplyKeyboardRemove()
 
